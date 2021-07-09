@@ -121,3 +121,74 @@ summary(datos$categ1)
 n.tot     <- nrow(datos)
 n.muestra <- round(n.tot * 0.1) 
 n.tot
+n.muestra
+
+# Genero los id de la muestra en forma aleatoria, sin reemplazo
+id.muestra <- sample(
+  1 : n.tot, 
+  size = n.muestra,
+  replace = FALSE
+)
+
+# Extraigo el sub set de datos de la muestra
+train  <- datos[id.muestra, ]
+
+mean(train$kids_r)
+
+# f. Seleccione 1000 muestras aleatorias del 10% de las observaciones totales 
+# guardando el promedio del Porcentaje de hogares con ninios en el radio censal 
+# (kids_r) en un vector
+# Seteamos una semilla para poder reproducir los mismos resultados
+
+set.seed(1974)
+
+# Creamos un vector para ir guardando los resultados de cada iteracion
+promedios  <- c()
+
+for (i in 1 : 50) {
+  id.muestra <- sample(
+    1 : n.tot, 
+    size = n.muestra,
+    replace = FALSE
+  )
+  
+  train  <- datos[id.muestra, ]
+  
+  result.it <- mean(train$kids_r)
+  
+  promedios <- c(promedios, result.it)
+  
+}
+
+dim(promedios)
+length(promedios)
+
+# g. Realice un histograma con los 1000 promedios calculados en el punto anterior
+hist(promedios)
+
+library(ggplot2)
+
+data.plot <- data.frame(promedios)
+head(data.plot)
+
+ggplot(data = data.plot, aes(x = promedios)) + # Se define el conjunto de datos y la/s variables a utilizar.
+  geom_histogram() # Se define el tipo de dato a utilizar.
+
+# Los graficos con el paquete ggplot2 permiten trabajar por capaz
+
+g0 <- ggplot(data = data.plot, aes(x = promedios)) + # Se define el conjunto de datos y la/s variables a utilizar.
+  geom_histogram() # Se define el tipo de dato a utilizar.
+g0
+
+nint <- 6 # se define el numero de intervalos
+amplitud  <- (max(data.plot$promedios) - min(data.plot$promedios)) / nint
+
+g1 <- g0 +  
+  geom_histogram(binwidth = amplitud) # Se define la amplitud de los intervalos.
+g1  
+
+g2 <- g1 +
+  geom_line(stat = "bin", color = "red", binwidth = amplitud) + # se agrega el poligono de frecuencia.
+  xlab("Promedio del porcentaje de propietarios") # Se agrega la etiqueta al eje x.
+g2
+
